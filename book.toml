@@ -1,5 +1,5 @@
 [book]
-title = "TITLE OF YOUR TRAINING WEEK"
-authors = ["Timo Betcke", "Matthew Scroggs", "ADD NAMES HERE"]
+title = "PDE Discretisations"
+authors = ["Timo Betcke", "Matthew Scroggs", "Colin Cotter"]
 language = "en"
 src = "src"
