@@ -250,6 +250,11 @@ Note that slurm automatically sent the job to both the compute nodes, as the
 required number of tasks exceeded the number of tasks either single node could
 fulfill.
 
+The directory which srun is run in will be the directory the running tasks
+start in, so should be visible to all nodes. In this cluster, it's recommended
+you use /data as it's visible everywhere, and persists between cluster
+start-ups.
+
 Full documentation at: [https://slurm.schedmd.com/srun.html](https://slurm.schedmd.com/srun.html)
 
 ### sbatch
@@ -284,7 +289,12 @@ Where 'job.sh' is a script that defines the job, such as:
 srun python3 helmholtz.py
 ```
 
-sbatch should return immediately with the job ID of your submitted job.
+sbatch should return immediately with the job ID of your submitted job, and
+once your job runs and completes will give you any output that was written to
+stdout and stderr via two files - by default slurm-<jobid>.out and
+slurm-<jobid>.err in the directory where you ran sbatch. This directory will
+also be the working directory of the running job, and as with srun should be a
+directory which is visible to all nodes. /data is recommended, in this cluster.
 
 The batch script allows much more flexible and complex work than the
 interactive 'srun', such as activating a venv, as in this example. 
@@ -340,5 +350,4 @@ Try the following:
 * In terminal 2, use 'squeue' to verify that your single-task job is now running
 * In terminal 2, use 'scancel' to cancel the single-task 'sleep 1000' job
 * In terminal 1, use 'squeue' to verify there are no longer any jobs running
-
 
