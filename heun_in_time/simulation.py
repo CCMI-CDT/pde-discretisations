@@ -14,6 +14,7 @@ def plotsol_animate(u_n, i):
     time.sleep(0.1)
     plt.close()
 
+
 def plotsol(u_n, i):
     plt.plot(range(len(u_n)), u_n)
     plt.xlabel("t")
@@ -22,6 +23,7 @@ def plotsol(u_n, i):
     plt.show()
     plt.close()
 
+
 def compute_u_hat(u_n: np.ndarray, c: float) -> np.ndarray:
     """
     Computes the intermediate prediction step (u_hat).
@@ -29,11 +31,13 @@ def compute_u_hat(u_n: np.ndarray, c: float) -> np.ndarray:
     """
     return -(c / 2) * u_n + (1 + c / 2) * np.roll(u_n, 1)
 
+
 def update_u_hat(u_hat: np.ndarray, c: float) -> np.ndarray:
     """
     Computes the update to u_hat.
     """
     return (c / 4) * (np.roll(u_hat, 1) - u_hat)
+
 
 def update_u_n(u_n: np.ndarray, c: float) -> np.ndarray:
     """
@@ -41,12 +45,13 @@ def update_u_n(u_n: np.ndarray, c: float) -> np.ndarray:
     """
     # 1. Compute prediction
     u_hat = compute_u_hat(u_n, c)
-    
+
     # 2. Update u_hat
     u_hat = update_u_hat(u_hat, c)
-    
+
     # 3. Final integration step
     return -(c / 4) * u_n + (1 + c / 4) * np.roll(u_n, 1) + u_hat
+
 
 def solve(u_n: np.ndarray, c: float, N: int, animate: bool = False) -> np.ndarray:
     """
@@ -57,6 +62,7 @@ def solve(u_n: np.ndarray, c: float, N: int, animate: bool = False) -> np.ndarra
         if animate:
             plotsol_animate(u_n, i)
     return u_n
+
 
 if __name__ == "__main__":
     # Simulation Parameters
@@ -77,6 +83,6 @@ if __name__ == "__main__":
 
     # Solve the PDE
     u_n = solve(u_n, c, N, animate=True)
-    
+
     # Plot the final solution
     plotsol(u_n, N)
