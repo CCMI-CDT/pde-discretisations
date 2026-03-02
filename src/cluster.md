@@ -291,8 +291,8 @@ srun python3 helmholtz.py
 
 sbatch should return immediately with the job ID of your submitted job, and
 once your job runs and completes will give you any output that was written to
-stdout and stderr via two files - by default slurm-<jobid>.out and
-slurm-<jobid>.err in the directory where you ran sbatch. This directory will
+stdout and stderr via two files - by default slurm-%<jobid%>.out and
+slurm-%<jobid%>.err in the directory where you ran sbatch. This directory will
 also be the working directory of the running job, and as with srun should be a
 directory which is visible to all nodes. /data is recommended, in this cluster.
 
