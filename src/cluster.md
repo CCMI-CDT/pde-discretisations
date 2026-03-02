@@ -140,3 +140,157 @@ Hello from rank 0 of 1 on host c2
 Hello from rank 0 of 1 on host c1
 ```
 
+## A primer on using cluster commands
+
+This mini-cluster runs [Slurm](https://slurm.schedmd.com/), a workload manager
+for HPC clusters. Slurm publish a [quickstart guide](https://slurm.schedmd.com/quickstart.html)
+which is highly recommended for news users, but those wanting no more than the 
+minimal operating commands for this cluster should be aware of the following:
+
+### sinfo
+
+View information about the cluster. Usage:
+
+```
+bash-5.1$ sinfo
+PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+normal*      up   infinite      2   idle c[1-2]
+gpu          up   infinite      0    n/a 
+bash5.1$
+```
+
+The output fields are:
+
+* PARTITION : a collection of resources for running your work
+* AVAIL: status of the partition
+* TIMELIMIT: how long a single job of work is allowed to run for
+* NODES: discrete physical or logical resources that run your work
+* STATE: whether the resource is allocated to work or not
+* NODELIST: the names of the resources in the partition
+
+Note that this cluster has both normal and gpu parititions which jobs can be
+submitted to, but by default the gpu partition is unconfigured.
+
+Full documentation at: [https://slurm.schedmd.com/sinfo.html](https://slurm.schedmd.com/sinfo.html)
+
+### squeue
+
+View information about jobs. Usage:
+
+```
+bash-5.1$ squeue
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+                 4    normal    sleep     user  R       0:07      2 c[1-2]
+bash-5.1$
+```
+
+Jobs, here, are units of work that you or other users have submitted to be run
+by the cluster.
+
+The output fields are:
+
+* JOBID: an identifier for a particular job
+* PARTITION: the collection of resources the job has been submitted to run on
+* NAME: a human-readable name for the job
+* USER: the submitter of the job
+* ST: the job state - R indicates 'running', PD indicates 'pending'.
+* TIME: how long the job has run for 
+* NODES: how many discrete physical or logical resources are assigned to the job
+* NODELIST: names of the resources assigned to the job
+
+Full documentation at: [https://slurm.schedmd.com/squeue.html](https://slurm.schedmd.com/squeue.html)
+
+### srun
+
+Run an interactive job, where your terminal remains connected.
+
+A minimal case, which returns the hostname of the node it runs on:
+
+```
+bash-5.1$ srun hostname
+c1
+bash-5.1$
+```
+
+A slightly more detailed case, running on two nodes (-n 2) and requesting two
+cores on each node (-c 2):
+
+```
+bash-5.1$ srun -n 2 -c 2 hostname
+c1
+c2
+bash-5.1$
+```
+
+Full documentation at: [https://slurm.schedmd.com/srun.html](https://slurm.schedmd.com/srun.html)
+
+### sbatch
+
+Run a non-interactive job, where the terminal returns immediately. Usage:
+
+```
+bash-5.1$ sbatch job.sh
+Submitted batch job 11
+bash-5.1$
+```
+
+Where 'job.sh' is a script that defines the job, such as:
+
+```
+#!/bin/bash
+
+### Slurm specifications for the job
+# Name of this job
+#SBATCH --job-name=helmholtz
+# Files to write stdout and stderr; %j is the job id
+#SBATCH --output=helmholtz_%j.out
+#SBATCH --error=helmholtz_%j.err
+# Nodes requested for this job
+#SBATCH --nodes=1
+# CPUs requested per node
+#SBATCH --ntasks-per-node=1       # Adjust to match your node's core count
+# Time requested for this job
+#SBATCH --time=00:05:00
+# Partition the job will submit to
+#SBATCH --partition=normal      # Change to your cluster's partition name
+
+### Job commands
+
+# Acctivate a venv
+. /data/venv-firedrake/bin/activate
+
+# Run the program
+srun python3 helmholtz.py
+```
+
+sbatch should return immediately with the job ID of your submitted job.
+
+The example above is the simplest resource allocation available - one core on
+one node. Increase both parameters for parallel jobs, and be realistic with
+your estimate of time. If your job exceeds the time you've specified it will
+be terminated - this can be useful to catch stalled jobs, but frustrating if
+your job runs slightly slower than expected and doesn't run to completion due
+to being terminated by slurm.
+
+Note in the above case - the batch script allows much more flexible and complex
+work than the interactive 'srun', such as activating a venv.
+
+Full documentation at: [https://slurm.schedmd.com/sbatch.html](https://slurm.schedmd.com/sbatch.html)
+
+### scancel
+
+Send signals to jobs, by default cancelling them. Usage:
+
+```
+bash-5.1$ scancel 13
+bash-5.1$ 
+```
+
+In this case, the job cancelled has ID '13'. Use 'squeue' to find the ID of the
+job you wish to cancel.
+
+Full documentation at: [https://slurm.schedmd.com/scancel.html](https://slurm.schedmd.com/scancel.html)
+
+
+
+
