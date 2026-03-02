@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as pp
 from scipy.linalg import circulant
+import os
 '''
 L = 1.0
 M = 100
@@ -50,15 +51,19 @@ def backward_euler(A, un):
 
 
 
-def dump(x, un, t, dcount, c):
+def dump(x, un, t, dcount, c, results_dir='results'):
+    # Create results directory with c subfolder if it doesn't exist
+    c_dir = os.path.join(results_dir, f'c_{c}')
+    os.makedirs(c_dir, exist_ok=True)
     pp.plot(x, un)
     pp.xlabel('x')
     pp.ylabel('y')
     pp.title(f'Solution at time {t}')
-    pp.savefig(f'beup_c{c}_dump{dcount}.jpg')
+    filepath = os.path.join(c_dir, f'beup_c{c}_dump{dcount}.jpg')
+    pp.savefig(filepath)
     pp.close()
 
-def simulate(c, a, t_max=1.0, tdump=0.2, L=1.0, M=100):
+def simulate(c, a, t_max=1.0, tdump=0.2, L=1.0, M=100, results_dir='results'):
     dx = L / M
     x = np.arange(0, L, dx)
     dt = dx*c/a
@@ -74,7 +79,7 @@ def simulate(c, a, t_max=1.0, tdump=0.2, L=1.0, M=100):
 
         dumpt += dt
         if dumpt > tdump - dt/2:
-            dump(x, un, t, dcount, c)
+            dump(x, un, t, dcount, c, results_dir)
             dumpt -= tdump
             dcount += 1
 
