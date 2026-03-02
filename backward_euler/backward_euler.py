@@ -18,21 +18,38 @@ dumpt = 0.0
 dcount = 0
 '''
 
-def stability_analysis():
-    pass
+def stability_analysis(A):
+    '''
+    Check if the magnitude of eigenvalues of the 
+    linear transformation for the backward Euler
+    centered scheme is less than/equal to 1
+    '''
+    Ainv = np.linalg.inv(A)
+    eigAinv = np.linalg.eig(Ainv)
+    print("Eigenvalues of A^-1:", np.abs(eigAinv))
+    if max(np.abs(eigAinv)) > 1.0:
+        print("Unstable")
+    else:
+        print("Stable")
 
 def build_matrix(c, M):
-
+    '''
+    Build a circulant matrix for the backward Euler
+    centered scheme applied to the 1-D advection equation
+    '''
     vals = np.zeros(M)
     vals[0] = 1.0
     vals[1] = c/2.0
     vals[-1] = -c/2.0
-    A = circulant(vals)   
+    A = circulant(vals)
+    stability_analysis(A)
     return A
 
 def backward_euler(A, un):
     un = np.linalg.solve(A, un)
     return un
+
+
 
 def dump(x, un, t, dcount, c):
     pp.plot(x, un)
