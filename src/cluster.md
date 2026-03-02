@@ -66,6 +66,15 @@ and running, and monitoring its own status.
 You can either leave the terminal monitoring output, or press 'd'
 to detach and return to the command prompt.
 
+If you wish to take the cluster down at some point, you can use:
+
+```
+docker compose down
+```
+
+in the mini-cluster/ directory, noting that /data will persist between
+cluster start-ups.
+
 ## Interacting with the cluster
 
 To run a shell in the cluster, as a user, run:
@@ -77,6 +86,17 @@ docker exec -u user -it slurmctld bash
 You should by default find yourself in /data , which is writeable
 by you, persistent over cluster restarts, and available to all the
 nodes in the cluster that your jobs will run on.
+
+Notes on usage: '-u <username>' here allows you to specify which user your
+shell will run as. In general, the user account 'user' is recommended, but if
+you want to make modifications to the cluster you can use 'root', noting that
+changes to the running system won't persist between one cluster start-up and
+the next. If you omit the '-u <username>' parameter, it defaults to 'root'.
+
+'-it' tells docker to allocate an interactive terminal so you can type and
+see output returned from the container you connect to, 'slurmctld' is the
+controller container for the cluster, and 'bash' is the name of the shell
+run for you to interact with.
 
 ## Building Firedrake
 
@@ -130,7 +150,7 @@ EOF
 Then run the test:
 
 ```bash
-srun -c 2 -n 2  python3 hello_mpi.py
+srun -n 4 python3 hello_mpi.py
 ```
 
 You should see output of the form:
@@ -138,6 +158,9 @@ You should see output of the form:
 ```
 Hello from rank 0 of 1 on host c2
 Hello from rank 0 of 1 on host c1
+Hello from rank 0 of 1 on host c2
+Hello from rank 0 of 1 on host c1
+
 ```
 
 ## A primer on using cluster commands
@@ -212,15 +235,20 @@ c1
 bash-5.1$
 ```
 
-A slightly more detailed case, running on two nodes (-n 2) and requesting two
-cores on each node (-c 2):
+A slightly more detailed case, running four tasks in parallel (-n 4):
 
 ```
-bash-5.1$ srun -n 2 -c 2 hostname
+bash-5.1$ srun -n 4 hostname
+c1
+c2
 c1
 c2
 bash-5.1$
 ```
+
+Note that slurm automatically sent the job to both the compute nodes, as the
+required number of tasks exceeded the number of tasks either single node could
+fulfill.
 
 Full documentation at: [https://slurm.schedmd.com/srun.html](https://slurm.schedmd.com/srun.html)
 
@@ -242,17 +270,10 @@ Where 'job.sh' is a script that defines the job, such as:
 ### Slurm specifications for the job
 # Name of this job
 #SBATCH --job-name=helmholtz
-# Files to write stdout and stderr; %j is the job id
-#SBATCH --output=helmholtz_%j.out
-#SBATCH --error=helmholtz_%j.err
 # Nodes requested for this job
 #SBATCH --nodes=1
 # CPUs requested per node
 #SBATCH --ntasks-per-node=1       # Adjust to match your node's core count
-# Time requested for this job
-#SBATCH --time=00:05:00
-# Partition the job will submit to
-#SBATCH --partition=normal      # Change to your cluster's partition name
 
 ### Job commands
 
@@ -265,15 +286,28 @@ srun python3 helmholtz.py
 
 sbatch should return immediately with the job ID of your submitted job.
 
-The example above is the simplest resource allocation available - one core on
-one node. Increase both parameters for parallel jobs, and be realistic with
-your estimate of time. If your job exceeds the time you've specified it will
-be terminated - this can be useful to catch stalled jobs, but frustrating if
-your job runs slightly slower than expected and doesn't run to completion due
-to being terminated by slurm.
+The batch script allows much more flexible and complex work than the
+interactive 'srun', such as activating a venv, as in this example. 
 
-Note in the above case - the batch script allows much more flexible and complex
-work than the interactive 'srun', such as activating a venv.
+The example above is the minimal resource allocation - one core on one node.
+Increase both parameters for parallel jobs.
+
+Note that the number of tasks has been specified slightly differently here than
+in the previous example of 'srun'. There, all we told slurm was how many tasks
+we wanted, and it figured out to send two to each node. Here, we're explicitly
+saying how many nodes we want allocated, and then how many tasks per node. This
+could be useful if you want to force the allocation of a full node to each of
+two tasks, rather than letting slurm allocate them both to the same node. 
+
+For most real-world clusters and jobs, your script will be far more complex
+than this one and will specify extra details about the resources your job
+needs, including but not limited to the expected time it will take to run and
+what compute resources it requires to be allocated. If your job exceeds the
+resources you've specified it will be terminated - this can be useful to catch
+stalled or runaway jobs, but frustrating if your job slightly exceeds the
+resources you expected to use and doesn't run to completion due to being
+terminated by slurm. In general, it's a good idea to slightly but not
+significantly over-specify resources for your job.
 
 Full documentation at: [https://slurm.schedmd.com/sbatch.html](https://slurm.schedmd.com/sbatch.html)
 
@@ -291,6 +325,20 @@ job you wish to cancel.
 
 Full documentation at: [https://slurm.schedmd.com/scancel.html](https://slurm.schedmd.com/scancel.html)
 
+## Suggested exercise
 
+Try the following:
+
+* Open two terminals, each using the 'docker exec' command above
+* In terminal 1, use 'srun' to submit a job which runs 'sleep 1000' in a single task
+* In terminal 2, use 'squeue' to view your job, then use 'scancel' to cancel it
+* In terminal 1, use 'srun' to submit a job which runs 'sleep 1000' with four tasks
+* In terminal 2, write a short job script to submit a single-task 'sleep 1000' job
+* In terminal 2, use 'sbatch' to submit the job script you've written
+* In terminal 2, use 'squeue' to view the status of the two extant jobs
+* In terminal 2, use 'scancel' to cancel the four-task job
+* In terminal 2, use 'squeue' to verify that your single-task job is now running
+* In terminal 2, use 'scancel' to cancel the single-task 'sleep 1000' job
+* In terminal 1, use 'squeue' to verify there are no longer any jobs running
 
 
