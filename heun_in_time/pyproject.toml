@@ -1,0 +1,11 @@
+[project]
+name = "heun-in-time"
+version = "0.1.0"
+description = "heun in time - central in space"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.10.8",
+    "numpy>=2.4.2",
+    "ruff>=0.15.4",
+]
