@@ -23,11 +23,9 @@ def plotsol(u_n, i):
     plt.show()
     plt.close()
 
-
 def compute_u_hat(u_n: np.ndarray, c: float) -> np.ndarray:
     """
-    Computes the intermediate prediction step (u_hat).
-    Applies a bidiagonal circulant operator to u_n.
+    Computes the intermediate variable u_hat.
     """
     return -(c / 2) * u_n + (1 + c / 2) * np.roll(u_n, 1)
 
@@ -73,9 +71,6 @@ if __name__ == "__main__":
     delta_x = L / M
     N = int(L / delta_t)
     c = (a * delta_x) / delta_t
-
-    # Define Intermediate Variable
-    u_hat = np.zeros(M)
 
     # Initial Condition
     u_n = np.ones(M)
