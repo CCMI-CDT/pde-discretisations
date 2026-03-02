@@ -32,8 +32,6 @@ def backward_euler(un):
     un = np.linalg.solve(A, un)
     return un
 
-
-
 def dump(t):
     pp.plot(x, un)
     pp.xlabel('x')
