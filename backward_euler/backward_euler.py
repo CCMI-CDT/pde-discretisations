@@ -56,11 +56,35 @@ def build_matrix_upwind(c, M):
     A = circulant(vals)
     return A
 
-def backward_euler(A, un):
-    un = np.linalg.solve(A, un)
-    return un
+def backward_euler(A, un, solver = 'fourier'):
+    """
+    If selected solver == 'direct'
+        Solve Ax = b using direct inversion
+        Computationally scales as O(M^3)
+    If selected solver == 'fourier'
+        Solve Ax = b using FFT
+        Where A is our circulant matrix for the backward Euler 
+        centered scheme for the 1D advection equation.
+        computationally scales as O(M log M)
+    """
+    if solver == 'direct':
+        un = np.linalg.solve(A, un)
+        return un
+    elif solver == 'fourier':
+        # compute p = Fb (Fourier transform of b, a vertical stack of u_n)
+        p = np.fft.fft(un) 
+        # s = Fa_1
+        a_1 = A[:,0] # First column of A
+        s = np.fft.fft(a_1)
+        # compute q = diag(s)^-1 p
+        q = p / s
+        # Solve for x = A^-1 b = F diag(s)^-1 F b
+        x = np.fft.ifft(q).real
+        return x 
+    else:
+        raise ValueError(f"Unknown solver: {solver}")
 
-def dump(x, un, t, dcount, c, results_dir='results'):
+def dump(x, un, t, dcount, c, solver, results_dir='results'):
     # Create results directory with c subfolder if it doesn't exist
     c_dir = os.path.join(results_dir, f'c_{c}')
     os.makedirs(c_dir, exist_ok=True)
@@ -68,11 +92,11 @@ def dump(x, un, t, dcount, c, results_dir='results'):
     pp.xlabel('x')
     pp.ylabel('y')
     pp.title(f'Solution at time {t}')
-    filepath = os.path.join(c_dir, f'beup_c{c}_dump{dcount}.jpg')
+    filepath = os.path.join(c_dir, f'beup_solver_{solver}_c{c}_dump{dcount}.jpg')
     pp.savefig(filepath)
     pp.close()
 
-def simulate(c, a, t_max=1.0, tdump=0.2, L=1.0, M=100, results_dir='results', method='upwind'):
+def simulate(c, a, t_max=1.0, tdump=0.2, L=1.0, M=100, results_dir='results', method='upwind', solver = 'fourier'):
     dx = L / M
     x = np.arange(0, L, dx)
     dt = dx*c/a
@@ -89,11 +113,11 @@ def simulate(c, a, t_max=1.0, tdump=0.2, L=1.0, M=100, results_dir='results', me
     dumpt = 0
     while t < t_max - dt/2:
         t += dt
-        un = backward_euler(A, un)
+        un = backward_euler(A, un, solver = solver)
 
         dumpt += dt
         if dumpt > tdump - dt/2:
-            dump(x, un, t, dcount, c, results_dir)
+            dump(x, un, t, dcount, c, solver, results_dir)
             dumpt -= tdump
             dcount += 1
 
