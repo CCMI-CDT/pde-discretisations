@@ -128,7 +128,8 @@ if __name__ == "__main__":
     parser.add_argument('--method', type=str, default="upwind", help="Space discretization method")
     parser.add_argument('--tmax', type=float, default=1.0)
     parser.add_argument('-m', type=int, default=100, help="Number of discretization points")
-    
+    parser.add_argument('--solver', type=str, default='fourier', help="Solver method for backward Euler ('fourier' or 'direct')") 
+       
     args = parser.parse_args()
     
     simulate(c=args.c, a=args.a, t_max=args.tmax, M=args.m, method=args.method)
