@@ -117,7 +117,45 @@ def fft_solve():
     pass
 
 def upwind_cn_solve():
-    pass
+    L = 1
+    n = 100
+    dx = L / n
+    x = np.arange(0., L, dx)
+    un = np.where(x < 0.5, 1, 0)
+    c = 1.
+    a = 1.
+    dt = dx * c / a
+    t = 0.
+    t_max = 2
+    t_dump = 0.1
+    dump_t = 0.
+    d_count = 0
+
+    l_col = np.zeros(n)
+    l_col[0] = 1 + c / 2
+    l_col[1] = -c / 2
+
+    r_col = np.zeros(n)
+    r_col[0] = 1 - c / 2
+    r_col[1] = c / 2
+
+    Lmat = scipy.linalg.circulant(l_col)
+    Rmat = scipy.linalg.circulant(r_col)
+
+    dump(x, un, t, d_count)
+    d_count = 1
+    while t < (t_max - dt / 2):
+        # Lu_{n+1} = Ru_{n}
+        t += dt
+        rhs = Rmat @ un
+
+        un = scipy.linalg.solve(Lmat, rhs)
+        
+        if t >= dump_t - 1e-12:
+            dump(x, un, t, d_count)
+            dump_t += t_dump
+            d_count += 1
+
 
 if __name__=='__main__':
-    matfree_solve()
+    upwind_cn_solve()
