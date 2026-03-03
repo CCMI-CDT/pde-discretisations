@@ -28,7 +28,7 @@ def stability_analysis(A):
     '''
     Ainv = np.linalg.inv(A)
     eigAinv = np.linalg.eigvals(Ainv)
-    if max(np.abs(eigAinv)) > 1.0:
+    if max(np.abs(eigAinv)) > 1.0 + 1e-8:
         print("Unstable")
     else:
         print("Stable")
@@ -101,7 +101,7 @@ def simulate(c, a, t_max=1.0, tdump=0.2, L=1.0, M=100, results_dir='results', me
     x = np.arange(0, L, dx)
     dt = dx*c/a
     un = np.zeros_like(x)
-    un[np.where(x>0.5)] = 1.0
+    un = np.sin(2*np.pi*x)
     if method == 'upwind':
         A = build_matrix_upwind(c, M)
     elif method == 'centered':
