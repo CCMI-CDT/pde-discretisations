@@ -36,7 +36,7 @@ $$
 I_{\text{direct}} = \frac{(2/3)M^3}{24M^2} \approx \frac{M}{36} \approx 28 \;\text{flops/byte},
 $$
 
-which is compute-bound — but all that compute is wasted re-factorising the same matrix. -->
+which is compute-bound, but all that compute is wasted re-factorising the same matrix. -->
 
 **Measured time: 22.7 s.**
 
@@ -93,15 +93,15 @@ $$
 W_{\text{FFT}} = N_t (10 M \log_2 M + 7M) = \mathcal{O}(N_t M \log M).
 $$
 
-The memory traffic per step involves a few length-$M$ complex vectors, totalling $\sim 80M$ bytes. The arithmetic intensity is
+<!-- The memory traffic per step involves a few length-$M$ complex vectors, totalling $\sim 80M$ bytes. The arithmetic intensity is
 
 $$
 I_{\text{FFT}} = \frac{10 M \log_2 M}{80 M} = \frac{\log_2 M}{8} \approx 1.25 \;\text{flops/byte}.
 $$
 
-This is memory-bound on most hardware, but the total data volume ($\sim 80$ KB) comfortably fits in L2 cache, so the memory bottleneck is much less severe than it appears from the intensity alone.
+This is memory-bound on most hardware, but the total data volume ($\sim 80$ KB) comfortably fits in L2 cache, so the memory bottleneck is much less severe than it appears from the intensity alone. -->
 
-**Measured time: 0.025 s — a 907× speedup over direct**
+**Measured time: 0.025 s, a 907× speedup over direct**
 
 ---
 
@@ -110,7 +110,7 @@ This is memory-bound on most hardware, but the total data volume ($\sim 80$ KB) 
 As $M$ grows, the asymptotic scaling is:
 
 - **Direct:** $\mathcal{O}(N_t M^3)$ — impractical for large grids.
-- **Pre-factored LU:** $\mathcal{O}(M^3 + N_t M^2)$ — the one-time factorisation dominates for moderate $N_t$, per-step cost dominates for large $N_t$.
+<!-- - **Pre-factored LU:** $\mathcal{O}(M^3 + N_t M^2)$ — the one-time factorisation dominates for moderate $N_t$, per-step cost dominates for large $N_t$. -->
 - **FFT:** $\mathcal{O}(N_t M \log M)$ — optimal for circulant systems, but requires the circulant structure.
 
-The FFT approach also has the best memory scaling at $\mathcal{O}(M)$ per step, compared to $\mathcal{O}(M^2)$ for either LU variant. A further minor optimisation would be to skip the `circulant()` call entirely in the FFT path, since we only ever need the first column of $A$ to compute the eigenvalues.
+<!-- The FFT approach also has the best memory scaling at $\mathcal{O}(M)$ per step. -->
