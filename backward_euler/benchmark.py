@@ -3,7 +3,7 @@ import numpy as np
 from scipy.linalg import circulant, lu_factor, lu_solve
 
 # Setup (same as simulate with c=1.0, a=1.0, M=1000)
-M = 2000
+M = 1000
 L = 1.0
 c = 1.0
 a = 1.0
