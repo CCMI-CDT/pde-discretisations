@@ -61,7 +61,7 @@ if __name__ == "__main__":
         np.linalg.norm(un_1),
     ]  # for Von Neumann Stability condition check
 
-    with writer.saving(fig, "pde-discretisations/group_4/visual/leapfrog.gif", dpi=100):
+    with writer.saving(fig, "./group_4/visual/leapfrog.gif", dpi=100):
         # write initial frame
         ax.set_title(f"Leapfrog at t={t:.2f}")
         writer.grab_frame()
