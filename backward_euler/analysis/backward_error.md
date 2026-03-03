@@ -45,17 +45,17 @@ $$
 Simplifying, we have that 
 
 $$
-u_t + au_x - \frac{\Delta t}{2}u_{tt} - a\frac{\Delta t}{2}u_{xx} = \mathcal{O}(\Delta t^2, \Delta x^2)
+u_t + au_x - \frac{\Delta t}{2}u_{tt} - a\frac{\Delta x}{2}u_{xx} = \mathcal{O}(\Delta t^2, \Delta x^2)
 $$
 
 We now aim to eliminate the time derivative $u_{tt}$.
 
 $$
-\partial_t : \ \ u_{tt} = -au_{xt} + \frac{\Delta t}{2}u_{ttt} + a\frac{\Delta t}{2}u_{xxt} + \mathcal{O}(\Delta t^2, \Delta x^2) 
+\partial_t : \ \ u_{tt} = -au_{xt} + \frac{\Delta t}{2}u_{ttt} + a\frac{\Delta x}{2}u_{xxt} + \mathcal{O}(\Delta t^2, \Delta x^2) 
 $$
 
 $$
-\partial_x : \ \ u_{tx} = -au_{xx} + \frac{\Delta t}{2}u_{ttx} + a\frac{\Delta t}{2}u_{xxx} + \mathcal{O}(\Delta t^2, \Delta x^2)
+\partial_x : \ \ u_{tx} = -au_{xx} + \frac{\Delta t}{2}u_{ttx} + a\frac{\Delta x}{2}u_{xxx} + \mathcal{O}(\Delta t^2, \Delta x^2)
 $$
 
 so, we can find
@@ -67,7 +67,13 @@ $$
 and therefore,
 
 $$
-u_t + au_x = \frac{\Delta t}{2}(a^2 + a)u_{xx} + \mathcal{O}(\Delta t^2, \Delta x^2)
+u_t + au_x = \frac{a \Delta x}{2}\left(1 + \frac{a \Delta t}{\Delta x} \right)u_{xx} + \mathcal{O}(\Delta t^2, \Delta x^2)
 $$
 
-as a positive coefficient in front of the even derivative means that we have diffusion, we can see that this is always satisfied as the method is upwind for positive $a$. Therefore, the backward upwind Euler method is unconditionally stable.
+rewriting using the Courant number, $c := \frac{a \Delta t}{\Delta x}$, 
+
+$$
+u_t + au_x = \frac{a \Delta x}{2}\left(1 + c \right)u_{xx} + \mathcal{O}(\Delta t^2, \Delta x^2)
+$$
+
+as a positive coefficient in front of the even derivative means that we have diffusion, we can see that this is always satisfied as the method is upwind for positive $a$ and so $c > 0$. Therefore, the backward upwind Euler method is unconditionally stable.
