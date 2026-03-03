@@ -32,15 +32,27 @@ def stability_analysis(A):
     else:
         print("Stable")
 
-def build_matrix(c, M):
+def build_matrix_centered(c, M):
     '''
     Build a circulant matrix for the backward Euler
     centered scheme applied to the 1-D advection equation
     '''
     vals = np.zeros(M)
-    vals[0] = 1.0 + c
-    vals[-1] = -1*c
+    vals[0] = 1.0
+    vals[1] = c/2
+    vals[-1] = -c/2
     A = circulant(vals)   
+    return A
+
+def build_matrix_upwind(c, M):
+    '''
+    Build a circulant matrix for the backward Euler
+    upwind scheme applied to the 1-D advection equation
+    '''
+    vals = np.zeros(M)
+    vals[0] = 1.0 + c
+    vals[-1] -c
+    A = circulant(vals)
     return A
 
 def backward_euler(A, un):
@@ -59,13 +71,18 @@ def dump(x, un, t, dcount, c, results_dir='results'):
     pp.savefig(filepath)
     pp.close()
 
-def simulate(c, a, t_max=1.0, tdump=0.2, L=1.0, M=100, results_dir='results'):
+def simulate(c, a, t_max=1.0, tdump=0.2, L=1.0, M=100, results_dir='results', method='upwind'):
     dx = L / M
     x = np.arange(0, L, dx)
     dt = dx*c/a
     un = np.zeros_like(x)
     un[np.where(x>0.5)] = 1.0
-    A = build_matrix(c, M)
+    if method == 'upwind':
+        A = build_matrix_upwind(c, M)
+    elif method == 'centered':
+        A = build_matrix_centered(c, M)
+    else:
+        raise ValueError
     t = 0.0
     dcount = 0
     dumpt = 0
@@ -80,4 +97,4 @@ def simulate(c, a, t_max=1.0, tdump=0.2, L=1.0, M=100, results_dir='results'):
             dcount += 1
 
 for c in [0.25, 0.5, 0.75, 1.0]:
-    simulate(c, 1.0)
+    simulate(c, a=1.0, method='upwind')
