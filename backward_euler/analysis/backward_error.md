@@ -61,19 +61,19 @@ $$
 so, we can find
 
 $$
-u_{tt} = a^2u_{xx} + \mathcal{O}(\Delta t^2, \Delta x^2)
+u_{tt} = a^2u_{xx} + \mathcal{O}(\Delta t, \Delta x)
 $$
 
 and therefore,
 
 $$
-u_t + au_x = \frac{a \Delta x}{2}\left(1 + \frac{a \Delta t}{\Delta x} \right)u_{xx} + \mathcal{O}(\Delta t^2, \Delta x^2)
+u_t + au_x = \frac{a \Delta x}{2}\left(1 + \frac{a \Delta t}{\Delta x} \right)u_{xx} + \mathcal{O}(\Delta t, \Delta x)
 $$
 
 rewriting using the Courant number, $c := \frac{a \Delta t}{\Delta x}$, 
 
 $$
-u_t + au_x = \frac{a \Delta x}{2}\left(1 + c \right)u_{xx} + \mathcal{O}(\Delta t^2, \Delta x^2)
+u_t + au_x = \frac{a \Delta x}{2}\left(1 + c \right)u_{xx} + \mathcal{O}(\Delta t, \Delta x)
 $$
 
 as a positive coefficient in front of the even derivative means that we have diffusion, we can see that this is always satisfied as the method is upwind for positive $a$ and so $c > 0$. Therefore, the backward upwind Euler method is unconditionally stable.
