@@ -25,7 +25,7 @@ is a solution, provided $\varphi$ is sufficiently regular.
 This is a finite difference method. We approximate
 
 $$
-u_m^n \approx u(m\Delta x,\, n\Delta t),
+u_m^n \approx u(m\Delta x,n\Delta t),
 $$
 
 with spatial step
@@ -59,25 +59,18 @@ $$
 **Centered difference (space one timestep ahead, implicit):**
 
 $$
-u_x \approx \frac{u_{m+1}^{\,n+1} - u_{m-1}^{\,n+1}}{2\Delta x}.
+u_x \approx \frac{u_{m+1}^{n+1} - u_{m-1}^{n+1}}{2\Delta x}.
 $$
 
 Substituting into the PDE $u_t + a u_x = 0$ gives
 
 $$
-\frac{u_m^{n+1} - u_m^n}{\Delta t}
-+ a \frac{u_{m+1}^{\,n+1} - u_{m-1}^{\,n+1}}{2\Delta x}
-= 0.
+\frac{u_m^{n+1} - u_m^n}{\Delta t} + a \frac{u_{m+1}^{n+1} - u_{m-1}^{n+1}}{2\Delta x} = 0.
 $$
 
 Multiplying through by $\Delta t$:
 
-$$
-u_m^{n+1} - u_m^n
-+ \frac{a\Delta t}{2\Delta x}
-\left(u_{m+1}^{\,n+1} - u_{m-1}^{\,n+1}\right)
-= 0.
-$$
+$$u_m^{n+1} - u_m^n+ \frac{a\Delta t}{2\Delta x}\left(u_{m+1}^{n+1} - u_{m-1}^{n+1}\right)= 0.$$
 
 Let the Courant number be
 
@@ -88,9 +81,7 @@ $$
 We arrive at the implicit scheme
 
 $$
-u_m^{n+1}
-+ \frac{c}{2}\left(u_{m+1}^{\,n+1} - u_{m-1}^{\,n+1}\right)
-= u_m^n.
+u_m^{n+1}+ \frac{c}{2}\left(u_{m+1}^{n+1} - u_{m-1}^{\,n+1}\right)= u_m^n.
 $$
 
 ---
@@ -100,37 +91,24 @@ $$
 Using Taylor expansion in space (at fixed time), we write
 
 $$
-u(x + \Delta x, \cdot)
-= u(x, \cdot)
-+ \Delta x\, u_x
-+ \frac{(\Delta x)^2}{2} u_{xx}
-+ \frac{(\Delta x)^3}{6} u_{xxx}
-+ \cdots,
+u(x + \Delta x, \cdot)= u(x, \cdot)+ \Delta xu_x+ \frac{(\Delta x)^2}{2} u_{xx}+ \frac{(\Delta x)^3}{6} u_{xxx}+ \cdots,
 $$
 
 and similarly
 
-$$
-u(x - \Delta x, \cdot)
-= u(x, \cdot)
-- \Delta x\, u_x
-+ \frac{(\Delta x)^2}{2} u_{xx}
-- \frac{(\Delta x)^3}{6} u_{xxx}
-+ \cdots.
+$$u(x - \Delta x, \cdot)= u(x, \cdot)- \Delta xu_x+ \frac{(\Delta x)^2}{2} u_{xx}- \frac{(\Delta x)^3}{6} u_{xxx}+ \cdots.
 $$
 
 Some rearranging gives
 
 $$
-2\Delta x\, u_x = u(x+\Delta x,\cdot) - u(x-\Delta x,\cdot) + \frac{2(\Delta x)^3}{6} u_{xxx}
-+ \cdots 
+2\Delta xu_x = u(x+\Delta x,\cdot) - u(x-\Delta x,\cdot) + \frac{2(\Delta x)^3}{6} u_{xxx}+ \cdots 
 $$
 
 Dividing by $2\Delta x$,
 
 $$
-u_x  = \frac{u(x+\Delta x,\cdot) - u(x-\Delta x,\cdot)}{2\Delta x}
-+  \mathcal{O}((\Delta x)^2).
+u_x  = \frac{u(x+\Delta x,\cdot) - u(x-\Delta x,\cdot)}{2\Delta x}+  \mathcal{O}((\Delta x)^2).
 $$
 
 We see the leading truncation error is of order $(\Delta x)^2$, an order better than standard forward-backward methods.
@@ -138,23 +116,22 @@ We see the leading truncation error is of order $(\Delta x)^2$, an order better 
 Let $u(x, t)$ solve $u_t + au_x=0$ and set $u_m^n = u(m \Delta x, n \Delta t)$. Define the residual as
 
 $$
-\tau_m^n := \left| u_t(m \Delta x, n \Delta t) + a\, u_x(m \Delta x, n \Delta t) - 
-\left( \frac{u_m^{\,n+1} - u_m^n}{\Delta t} 
-+ a\, \frac{u_{m+1}^{\,n+1} - u_{m-1}^{\,n+1}}{2 \Delta x} \right) \right|.
+\tau_m^n := \left| u_t(m \Delta x, n \Delta t) + au_x(m \Delta x, n \Delta t) - \left( \frac{u_m^{n+1} - u_m^n}{\Delta t} + a\frac{u_{m+1}^{n+1} - u_{m-1}^{n+1}}{2 \Delta x} \right) \right|
 $$
 
 By the triangle inequality, we can bound
 
 $$
-\tau_m^n \le \left| u_t(m \Delta x, n \Delta t) - \frac{u_m^{\,n+1} - u_m^n}{\Delta t} \right|
-+ a \left| u_x(m \Delta x, n \Delta t) - \frac{u_{m+1}^{\,n+1} - u_{m-1}^{\,n+1}}{2 \Delta x} \right|.
+\tau_m^n \le \left| u_t(m \Delta x, n \Delta t) - \frac{u_m^{n+1} - u_m^n}{\Delta t} \right| + a \left| u_x(m \Delta x, n \Delta t) - \frac{u_{m+1}^{n+1} - u_{m-1}^{n+1}}{2 \Delta x} \right|
 $$
 
 Taylor in time and our above centered difference approximation:
 
 $$
-\frac{u_m^{\,n+1} - u_m^n}{\Delta t} = u_t(m \Delta x, n \Delta t) + \mathcal{O}(\Delta t), \qquad
-\frac{u_{m+1}^{\,n+1} - u_{m-1}^{\,n+1}}{2 \Delta x} = u_x(m \Delta x, n \Delta t) + \mathcal{O}((\Delta x)^2) + \mathcal{O}(\Delta t).
+\frac{u_m^{n+1} - u_m^n}{\Delta t} = u_t(m \Delta x, n \Delta t) + \mathcal{O}(\Delta t)
+$$
+$$
+\frac{u_{m+1}^{n+1} - u_{m-1}^{n+1}}{2 \Delta x} = u_x(m \Delta x, n \Delta t) + \mathcal{O}((\Delta x)^2) + \mathcal{O}(\Delta t)
 $$
 
 and therefore the residual satisfies
