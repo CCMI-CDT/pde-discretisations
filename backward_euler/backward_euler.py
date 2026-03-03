@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as pp
 from scipy.linalg import circulant
 import os
+import argparse
 '''
 L = 1.0
 M = 100
@@ -51,7 +52,7 @@ def build_matrix_upwind(c, M):
     '''
     vals = np.zeros(M)
     vals[0] = 1.0 + c
-    vals[-1] -c
+    vals[-1] = -c
     A = circulant(vals)
     return A
 
@@ -96,5 +97,14 @@ def simulate(c, a, t_max=1.0, tdump=0.2, L=1.0, M=100, results_dir='results', me
             dumpt -= tdump
             dcount += 1
 
-for c in [0.25, 0.5, 0.75, 1.0]:
-    simulate(c, a=1.0, method='upwind')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Backward Euler solver with Upwind and Centered schemes")
+    parser.add_argument('-c', type=float, default=0.25, help="Courant number")
+    parser.add_argument('-a', type=float, default=1.0, help="Advection velocity")
+    parser.add_argument('--method', type=str, default="upwind", help="Space discretization method")
+    parser.add_argument('--tmax', type=float, default=1.0)
+    parser.add_argument('-m', type=int, default=100, help="Number of discretization points")
+    
+    args = parser.parse_args()
+    
+    simulate(c=args.c, a=args.a, t_max=args.tmax, M=args.m, method=args.method)
