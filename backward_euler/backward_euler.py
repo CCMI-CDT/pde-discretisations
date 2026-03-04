@@ -121,6 +121,68 @@ def simulate(c, a, t_max=1.0, tdump=0.2, L=1.0, M=100, results_dir='results', me
             dumpt -= tdump
             dcount += 1
 
+def plot_diffusion_dispersion_error(c_values, M=100, method='upwind'):
+    """
+    Plot diffusion and dispersion errors for multiple CFL numbers
+    for Fourier modes phi in [-pi, pi] using the correct phase factor.
+
+    Diffusion error = |A / A_exact|
+    Dispersion error = arg(A / A_exact)
+    """
+    # Fourier modes: l = -M/2 ... M/2-1
+    l = np.arange(-M//2, M//2)
+    phi = 2 * np.pi * l / M  # Standard 2π normalization, φ ∈ [-π, π]
+
+    pp.figure(figsize=(12,5))
+
+    # Diffusion error plot
+    pp.subplot(1,2,1)
+    for c in c_values:
+        if method == 'upwind':
+            # Upwind Backward Euler amplification
+            A = 1 / (1 + c - c * np.exp(-1j * phi))
+        elif method == 'centered':
+            # Centered Backward Euler amplification
+            A = 1 / (1 - 1j * c * np.sin(phi))
+        else:
+            raise ValueError("Unknown method")
+
+        # Exact PDE amplification (pure advection)
+        A_exact = np.exp(-1j * c * phi)
+
+        diffusion_error = np.abs(A / A_exact)
+        pp.plot(phi, diffusion_error, label=f'c={c}')
+
+    pp.xlabel(r'$\phi$ (rad)')
+    pp.ylabel(r'Diffusion error $|A/A_{exact}|$')
+    pp.title(f'Diffusion error ({method} scheme)')
+    pp.grid(True)
+    pp.legend()
+    pp.xlim([-np.pi, np.pi])
+
+    # Dispersion error plot
+    pp.subplot(1,2,2)
+    for c in c_values:
+        if method == 'upwind':
+            A = 1 / (1 + c - c * np.exp(-1j * phi))
+        elif method == 'centered':
+            A = 1 / (1 - 1j * c * np.sin(phi))
+
+        A_exact = np.exp(-1j * c * phi)
+        dispersion_error = np.angle(A / A_exact)
+        pp.plot(phi, dispersion_error, label=f'c={c}')
+
+    pp.xlabel(r'$\phi$ (rad)')
+    pp.ylabel('Dispersion error (rad)')
+    pp.title(f'Dispersion error ({method} scheme)')
+    pp.grid(True)
+    pp.legend()
+    pp.xlim([-np.pi, np.pi])
+
+    pp.tight_layout()
+    pp.show()
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Backward Euler solver with Upwind and Centered schemes")
     parser.add_argument('-c', type=float, default=0.25, help="Courant number")
