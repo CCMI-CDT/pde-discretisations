@@ -7,7 +7,7 @@ def dudt(u, u_, dt):
     return ((u - u_)/dt)
 
 t_max = 0.1
-dt = 1/2000 # Time discretisation large enough to have negligible effect on error
+dt = 1/200 # Time discretisation large enough to have negligible effect on error
 
 k = 2 * pi # Frequency 
 omega = k**2
@@ -31,9 +31,13 @@ for num_cells in cells:
     psi.assign(psi_0)
     psi_r, psi_i = split(psi) # Split into real and complex parts
 
+    # Implicit midpoint scheme schrodinger/schrodinger_errors.py
+    psi_rh = (psi_r0 + psi_r) / 2
+    psi_ih = (psi_i0 + psi_i) / 2
+
     # Residual in real and complex variables
-    F1 = (inner(dudt(psi_i, psi_i0, dt), v[0]) + inner(grad(psi_r), grad(v[0]))) * dx
-    F2 = (inner(dudt(psi_r, psi_r0, dt), v[1]) - inner(grad(psi_i), grad(v[1]))) * dx
+    F1 = (inner(dudt(psi_i, psi_i0, dt), v[0]) + inner(grad(psi_rh), grad(v[0]))) * dx
+    F2 = (inner(dudt(psi_r, psi_r0, dt), v[1]) - inner(grad(psi_ih), grad(v[1]))) * dx
     F = F1 + F2
 
     t = 0.0
@@ -64,14 +68,19 @@ for num_cells in cells:
 
 final_errors = np.array(final_errors)
 
-#line of best fit 
-log_dx = np.log(cells)
-log_err = np.log(final_errors)
-slope, intercept = np.polyfit(log_dx, log_err, 1)
+# Reference line in log-space with fixed slope -2 through (xd, yd)
+log_x = np.log(cells)
+log_y = np.log(final_errors)
+xd, yd = log_x[0], log_y[0]
+slope = -2.0
+
+# log(y_ref) = yd + slope * (log(x) - xd)
+log_y_ref = yd + slope * (log_x - xd)
+y_ref = np.exp(log_y_ref)
 
 plt.figure()
 plt.loglog(cells, final_errors, '-', label='L2 error')
-plt.loglog(cells, np.exp(intercept)*(cells)**slope, 'r--', label=f'Fit slope ≈ {slope:.2f}')
+plt.loglog(cells, y_ref, '--', label='Reference slope -2 through (xd, yd)')
 plt.xlabel('Number of cells')
 plt.ylabel('Final time L2 error')
 plt.legend()
