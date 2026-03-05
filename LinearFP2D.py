@@ -41,7 +41,7 @@ u_.assign(u)
 
 timestep=1.0/n
 
-F = (inner(b_tilde*u,nabla_grad(v)) + inner(D_tilde*nabla_grad(u),nabla_grad(v)))*dx - inner(v,(u - u_)/timestep)*dx
+F = (inner(b_tilde*u,nabla_grad(v)) + inner(D_tilde*nabla_grad(u),nabla_grad(v)))*dx - inner(v,(u_ - u)/timestep)*dx
 
 
 outfile = VTKFile("Fokker-Planck.pvd")
