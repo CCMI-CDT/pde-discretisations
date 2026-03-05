@@ -22,7 +22,7 @@ v = TestFunction(V)
 
 # phi_rn, phi_in = split(Function(V))
 psi_0 = Function(V)
-psi_0.interpolate(as_vector([sin(2*pi*x[0]), sin(2*pi*x[0])]))
+psi_0.interpolate(as_vector([sin(4*pi*x[0]), sin(4*pi*x[0])]))
 psi_r0, psi_i0 = split(psi_0)
 
 psi = Function(V)
@@ -37,8 +37,11 @@ F = F1 + F2
 num_steps = int(np.floor(t_max/dt))
 sol_history = []
 t_values = np.linspace(0, num_steps*dt, num_steps+1)
-
-for step in range(num_steps):
+t_array = []
+t = 0
+while t < t_max - dt/2:
+    t_array.append(t)
+    t += dt
     solve(F == 0, psi)
     psi_0.assign(psi)
     # extract real component at each degree of freedom
@@ -49,11 +52,14 @@ for step in range(num_steps):
 sol_history = np.array(sol_history)
 
 # get spatial coordinates for plotting
-coords = mesh.coordinates.dat.data[:, 0]
+coords = mesh.coordinates.dat.data[0:-1:2]
+
+print(len(coords))
+print(len(t_array))
 
 # create contour map: t along vertical axis (rows), x along horizontal
-T, X = np.meshgrid(t_values[:-1], coords, indexing='ij')
-
+T, X = np.meshgrid(np.array(t_array), coords, indexing='ij')
+print(np.shape(X), np.shape(T), np.shape(sol_history))
 plt.figure()
 cs = plt.contourf(X, T, sol_history, cmap='viridis')
 plt.colorbar(cs, label='real(ψ)')
