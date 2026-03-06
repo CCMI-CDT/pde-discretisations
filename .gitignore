@@ -1,2 +1,16 @@
 book
 */.ipynb_checkpoints/
+
+# Slides
+*.pdf
+
+# Outputs
+*.png
+*.mp4
+*.pvd
+*.vtu
+
+# Firedrake
+constraints.txt
+firedrake-configure
+petsc/
