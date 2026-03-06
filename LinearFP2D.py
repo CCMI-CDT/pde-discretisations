@@ -44,7 +44,7 @@ mass = assemble(u*dx)
 u.assign(u/mass)
 u_.assign(u)
 
-timestep=1.0/n
+timestep=0.1/n
 
 F = (-inner(b*u,nabla_grad(v)) + inner(D*nabla_grad(u),nabla_grad(v)))*dx - inner(v,(u_ - u)/timestep)*dx
 
@@ -55,16 +55,19 @@ outfile.write(u)
 
 t = 0.0
 end = 5
+i=0
 while (t <= end):
     solve(F==0,u)
     u_.assign(u)
     t += timestep
+    i=i+1
     outfile.write(u)
-    fig, axes = plt.subplots()
-    colors = tripcolor(u, axes=axes)
-    fig.colorbar(colors)
-    plt.savefig("Linear_FP.png", dpi=200)
-    print("Saved plot to Linear_FP.png")
-    print(assemble(u*dx))
-    time.sleep(1)
-    plt.close()
+    if i%50==0:
+        fig, axes = plt.subplots()
+        colors = tripcolor(u, axes=axes)
+        fig.colorbar(colors)
+        plt.savefig(f"Linear_FP{i}.png", dpi=200)
+        print("Saved plot to Linear_FP.png")
+        print(assemble(u*dx)) #Checking mass conserved
+        time.sleep(1)
+        plt.close()
