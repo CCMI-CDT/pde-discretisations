@@ -194,4 +194,5 @@ if __name__ == "__main__":
        
     args = parser.parse_args()
     
-    simulate(c=args.c, a=args.a, t_max=args.tmax, M=args.m, method=args.method)
+    simulate(c=args.c, a=args.a, t_max=args.tmax, M=args.m, method=args.method, solver = args.solver)
+    plot_diffusion_dispersion_error([args.c], M=args.m, method=args.method)
