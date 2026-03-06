@@ -1,2 +1,8 @@
 book
+.venv/
 */.ipynb_checkpoints/
+*.jpg
+results/
+petsc/
+constraints.txt
+firedrake-configure
